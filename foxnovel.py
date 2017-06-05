@@ -149,12 +149,13 @@ def qidian_GetTOC_Android7(html) :
 	""" URL Like: http://druid.if.qidian.com/Atom.axd/Api/Book/GetChapterList?BookId=1009281388&timeStamp=0&requestSource=0&md5Signature= """
 	urlHead = ''
 	xx = re.search('"BookId":([0-9]+),', html, re.I)
-	if xx : urlHead = "http://files.qidian.com/Author" + str( 1 + ( int(xx.group(1)) % 8 ) ) + "/" + xx.group(1) + "/"
+#	if xx : urlHead = "http://files.qidian.com/Author" + str( 1 + ( int(xx.group(1)) % 8 ) ) + "/" + xx.group(1) + "/"
+	if xx : urlHead = "GetContent?BookId=" + xx.group(1) + "&ChapterId="
 
 	toc = [] # 获取目录列表{'url':, 'name':, 'len':n }
 	for link in re.finditer('"c":([0-9]+),"n":"([^"]+)".*?"v":([01]),', html, re.M | re.I) :
 		item = {}
-		item['url']  = urlHead + link.group(1) + ".txt"
+		item['url']  = urlHead + link.group(1)
 		item['name'] = link.group(2)
 		item['len']  = len(item['url'])
 		if '0' == link.group(3) : # Public Chapters
@@ -163,13 +164,14 @@ def qidian_GetTOC_Android7(html) :
 	return toc
 
 def qidian_GetContent_Android7(html) :
-	return html.replace(u"'　　", "").replace(u'<p>　　', '\n').replace('document.write(', '').replace(u"<a href=http://www.qidian.com>起点中文网 www.qidian.com 欢迎广大书友光临阅读，最新、最快、最火的连载作品尽在起点原创！</a>", "").replace(u"<a>手机用户请到m.qidian.com阅读。</a>", "").replace("');", "")
-
+	xx = re.search('"Data":"([^"]+)"', html, re.M | re.I)
+	if xx : html = xx.group(1)
+	return html.replace(u'\\r\\n', '\n').replace(u"　　", "")
 
 if '__main__' == __name__ :
 	import foxOS
-	html = foxOS.fileread('a.html')
-	print getContent(html)
+	html = foxOS.fileread('22.json').decode('utf-8')
+	print qidian_GetContent_Android7(html)
 
 #	for lk in getTOC(html):
 #		print lk['url'] + " : " + lk['name']

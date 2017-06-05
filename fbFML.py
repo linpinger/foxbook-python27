@@ -9,10 +9,14 @@ import foxnovel
 
 import threading
 import os
-import sys
 import re
 from urlparse import urljoin
 import getopt
+
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 
 def getAllNeedUpIDX() : # 获取所有需要更新TOC的bookIDX列表，依赖shelf
 	retList = []
@@ -144,8 +148,8 @@ class updatePages(threading.Thread):
 			# 下载页面
 			html = foxhttp.gethtml(pageFullURL, '', RETRY)
 			# 写入结构
-			if 'files.qidian.com/' in pageFullURL :
-				text = foxnovel.qidian_GetContent_Android7(html.decode('GB18030')).encode('utf-8')
+			if '.qidian.com/' in pageFullURL :
+				text = foxnovel.qidian_GetContent_Android7(html.decode('utf-8'))
 			else :
 				nowEnc = foxhttp.detectHtmlEncoding(html, pageFullURL)
 				text = foxnovel.getContent(html).decode(nowEnc).encode('utf-8')
